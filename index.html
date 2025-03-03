@@ -3,14 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NWS Grid Lookup</title>
+    <title>Jay's Weather App</title>
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <h2>NWS Grid Lookup by ZIP Code</h2>
-    <input type="text" id="zipInput" placeholder="Enter ZIP Code" />
-    <button onclick="getGridInfo()">Get Grid Info</button>
-    <p id="output"></p>
+    <h2>Jay's Weather App</h2>
+    
+    <div class="form-container top-form">
+      <input type="text" id="zipInput" placeholder="Enter ZIP Code" />
+      <button onclick="getGridInfo()">Get Weather Forecast</button>
+    </div>
+    
+    <div class="forecast-section">
+      <div id="forecast-display"></div>
+    </div>
+    
+    <div id="output" class="bottom-data">Enter a ZIP code above to get the weather forecast.</div>
 
     <!-- Include the external JavaScript file -->
     <script src="script.js"></script>
