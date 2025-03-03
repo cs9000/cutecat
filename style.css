@@ -1,5 +1,4 @@
 
-
 html {
   height: 100%;
   width: 100%;
@@ -33,10 +32,26 @@ button:hover {
   background-color: #004999;
 }
 
+.top-form {
+  margin-bottom: 20px;
+}
+
+.forecast-section {
+  margin: 20px 0;
+}
+
 #output {
-  margin-top: 20px;
+  margin-top: 30px;
+  padding: 15px 0;
   border-top: 1px solid #ddd;
-  padding-top: 15px;
+}
+
+.form-container {
+  padding: 10px 0;
+}
+
+.bottom-data {
+  font-size: 0.9em;
 }
 
 .location-info {
