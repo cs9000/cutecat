@@ -1,14 +1,38 @@
 
-async function getGridInfo() {
-  console.log("hello!");
+// Load weather on page load if zip code exists
+document.addEventListener('DOMContentLoaded', function() {
+  const savedZip = localStorage.getItem('userZipCode');
+  if (savedZip) {
+    document.getElementById("zipInput").value = savedZip;
+    getGridInfo(true);
+  }
+  
+  // Add event listener for Enter key in the zip input
+  document.getElementById("zipInput").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      getGridInfo();
+    }
+  });
+});
+
+async function getGridInfo(skipZipCheck = false) {
+  console.log("Fetching weather data...");
   const zipCode = document.getElementById("zipInput").value;
   const output = document.getElementById("output");
-  if (!zipCode) {
+  
+  if (!zipCode && !skipZipCheck) {
     output.textContent = "Please enter a ZIP code.";
     return;
   }
+  
+  // Save the zip code to localStorage
+  if (zipCode) {
+    localStorage.setItem('userZipCode', zipCode);
+  }
 
-  output.innerHTML = "Loading data...";
+  output.innerHTML = "Loading location data...";
+  document.getElementById("forecast-display").innerHTML = "Loading forecast...";
 
   try {
     // Get latitude and longitude from OpenStreetMap Nominatim API
@@ -49,14 +73,8 @@ async function getGridInfo() {
     
     const periods = forecastData.properties.periods;
     
-    // Create forecast HTML
+    // Create forecast HTML for the top section
     let forecastHtml = `
-      <div class="location-info">
-        <strong>ZIP Code:</strong> ${zipCode} <br>
-        <strong>Latitude:</strong> ${lat}, <strong>Longitude:</strong> ${lon} <br>
-        <strong>NWS Grid ID:</strong> ${gridId} <br>
-        <strong>Grid X:</strong> ${gridX}, <strong>Grid Y:</strong> ${gridY}
-      </div>
       <h3>Weather Forecast</h3>
       <div class="forecast-container">
     `;
@@ -79,8 +97,19 @@ async function getGridInfo() {
     
     forecastHtml += `</div>`;
     
+    // Create location info HTML for the bottom section
+    let locationHtml = `
+      <div class="location-info">
+        <strong>ZIP Code:</strong> ${zipCode} <br>
+        <strong>Latitude:</strong> ${lat}, <strong>Longitude:</strong> ${lon} <br>
+        <strong>NWS Grid ID:</strong> ${gridId} <br>
+        <strong>Grid X:</strong> ${gridX}, <strong>Grid Y:</strong> ${gridY}
+      </div>
+    `;
+    
     // Display the results
-    output.innerHTML = forecastHtml;
+    document.getElementById("forecast-display").innerHTML = forecastHtml;
+    output.innerHTML = locationHtml;
   } catch (error) {
     output.textContent = "An error occurred while fetching data.";
     console.error(error);
