@@ -1,6 +1,9 @@
 
-// Load weather on page load if zip code exists
+// Load weather on page load if zip code exists and display recent zip codes
 document.addEventListener('DOMContentLoaded', function() {
+  // Display recent zip codes
+  updateRecentZipCodes();
+  
   const savedZip = localStorage.getItem('userZipCode');
   if (savedZip) {
     document.getElementById("zipInput").value = savedZip;
@@ -16,6 +19,32 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+// Function to update and display the recent zip codes
+function updateRecentZipCodes() {
+  let recentZips = JSON.parse(localStorage.getItem('recentZipCodes')) || [];
+  const recentZipsContainer = document.getElementById("recent-zips");
+  
+  if (recentZips.length > 0) {
+    let html = '<div class="recent-zips-label">Recent searches:</div>';
+    recentZips.forEach(zip => {
+      html += `<a href="#" class="zip-link" data-zip="${zip}">${zip}</a>`;
+    });
+    recentZipsContainer.innerHTML = html;
+    
+    // Add click event listeners to the zip code links
+    document.querySelectorAll('.zip-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const zip = this.getAttribute('data-zip');
+        document.getElementById("zipInput").value = zip;
+        getGridInfo();
+      });
+    });
+  } else {
+    recentZipsContainer.innerHTML = '';
+  }
+}
+
 async function getGridInfo(skipZipCheck = false) {
   console.log("Fetching weather data...");
   const zipCode = document.getElementById("zipInput").value;
@@ -26,9 +55,27 @@ async function getGridInfo(skipZipCheck = false) {
     return;
   }
   
-  // Save the zip code to localStorage
+  // Save the zip code to localStorage and update recent zip codes
   if (zipCode) {
     localStorage.setItem('userZipCode', zipCode);
+    
+    // Update the recent zip codes list
+    let recentZips = JSON.parse(localStorage.getItem('recentZipCodes')) || [];
+    
+    // Remove the zip code if it already exists in the list
+    recentZips = recentZips.filter(zip => zip !== zipCode);
+    
+    // Add the new zip code to the beginning of the array
+    recentZips.unshift(zipCode);
+    
+    // Keep only the three most recent zip codes
+    recentZips = recentZips.slice(0, 3);
+    
+    // Save the updated list back to localStorage
+    localStorage.setItem('recentZipCodes', JSON.stringify(recentZips));
+    
+    // Update the displayed recent zip codes
+    updateRecentZipCodes();
   }
 
   output.innerHTML = "Loading location data...";
@@ -73,9 +120,30 @@ async function getGridInfo(skipZipCheck = false) {
     
     const periods = forecastData.properties.periods;
     
-    // Create forecast HTML for the top section
+    // Extract location name without zip code
+    let locationName = "";
+    if (geoData[0].display_name) {
+      // Get display name and remove zip code
+      const addressParts = geoData[0].display_name.split(',');
+      // Find the part that has the zip code and skip it
+      for (let i = 0; i < addressParts.length; i++) {
+        if (addressParts[i].trim().match(/^\d{5}(-\d{4})?$/)) {
+          continue; // Skip the zip code part
+        }
+        // Use the first non-zip code part
+        locationName = addressParts[i].trim();
+        break;
+      }
+      
+      // If no location was found, use the first part as fallback
+      if (!locationName && addressParts.length > 0) {
+        locationName = addressParts[0].trim();
+      }
+    }
+    
+    // Create forecast HTML for the top section with location name
     let forecastHtml = `
-      <h3>Weather Forecast</h3>
+      <h3>${locationName}</h3>
       <div class="forecast-container">
     `;
     
@@ -84,13 +152,14 @@ async function getGridInfo(skipZipCheck = false) {
     for (let i = 0; i < periodsToShow; i++) {
       const period = periods[i];
       forecastHtml += `
-        <div class="forecast-period">
-          <h4>${period.name}</h4>
-          <img src="${period.icon}" alt="${period.shortForecast}" style="width:50px;height:50px;">
-          <p><strong>Temperature:</strong> ${period.temperature}${period.temperatureUnit}</p>
-          <p><strong>Wind:</strong> ${period.windSpeed} ${period.windDirection}</p>
-          <p>${period.shortForecast}</p>
-          <p class="forecast-detail">${period.detailedForecast}</p>
+        <div class="forecast-period collapsed">
+          <div class="forecast-content">
+            <h4>${period.name}</h4>
+            <img src="${period.icon}" alt="${period.shortForecast}" style="width:50px;height:50px;">
+            <p><strong>Temperature:</strong> ${period.temperature}${period.temperatureUnit}    <strong>Wind:</strong> ${period.windSpeed} ${period.windDirection}</p>
+            <p>${period.shortForecast}</p>
+            <p class="forecast-detail hidden">${period.detailedForecast}</p>
+          </div>
         </div>
       `;
     }
@@ -110,6 +179,15 @@ async function getGridInfo(skipZipCheck = false) {
     // Display the results
     document.getElementById("forecast-display").innerHTML = forecastHtml;
     output.innerHTML = locationHtml;
+    
+    // Add click event listeners to the forecast periods
+    document.querySelectorAll('.forecast-period').forEach(box => {
+      box.addEventListener('click', function() {
+        this.classList.toggle('collapsed');
+        const detailEl = this.querySelector('.forecast-detail');
+        detailEl.classList.toggle('hidden');
+      });
+    });
   } catch (error) {
     output.textContent = "An error occurred while fetching data.";
     console.error(error);
