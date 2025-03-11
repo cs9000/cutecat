@@ -6,14 +6,49 @@ html {
 
 body {
   font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+.container {
+  width: 100%;
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
-  line-height: 1.6;
+  box-sizing: border-box;
 }
 
 h2 {
   color: #0066cc;
+  margin-bottom: 10px;
+}
+
+.recent-zips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
+  align-items: center;
+}
+
+.recent-zips-label {
+  font-size: 0.9em;
+  color: #666;
+}
+
+.zip-link {
+  display: inline-block;
+  padding: 5px 10px;
+  background-color: #e7f1fa;
+  color: #0066cc;
+  text-decoration: none;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+.zip-link:hover {
+  background-color: #d0e5f7;
 }
 
 input, button {
@@ -32,12 +67,19 @@ button:hover {
   background-color: #004999;
 }
 
-.top-form {
-  margin-bottom: 20px;
+.form-container {
+  margin: 20px 0;
 }
 
 .forecast-section {
   margin: 20px 0;
+}
+
+.forecast-section h3 {
+  color: #0066cc;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 8px;
 }
 
 #output {
@@ -48,6 +90,20 @@ button:hover {
 
 .form-container {
   padding: 10px 0;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+}
+
+.form-container input {
+  width: 120px;
+  box-sizing: border-box;
+}
+
+.form-container button {
+  flex-grow: 1;
+  box-sizing: border-box;
 }
 
 .bottom-data {
@@ -63,18 +119,29 @@ button:hover {
 
 .forecast-container {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 15px;
   margin-top: 15px;
 }
 
 .forecast-period {
-  flex: 1;
-  min-width: 200px;
+  width: 100%;
   border: 1px solid #ddd;
   border-radius: 5px;
-  padding: 10px;
+  padding: 15px;
   background-color: #f9f9f9;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.forecast-period:hover {
+  background-color: #f0f0f0;
+  border-color: #bbb;
+}
+
+.forecast-period.collapsed {
+  padding-bottom: 10px;
 }
 
 .forecast-period h4 {
@@ -85,4 +152,26 @@ button:hover {
 .forecast-detail {
   font-size: 0.9em;
   color: #555;
+  transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
+}
+
+.forecast-detail.hidden {
+  max-height: 0;
+  opacity: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.forecast-period:after {
+  content: "Click to expand";
+  display: block;
+  text-align: center;
+  font-size: 0.8em;
+  color: #0066cc;
+  margin-top: 5px;
+  font-style: italic;
+}
+
+.forecast-period:not(.collapsed):after {
+  content: "Click to collapse";
 }
