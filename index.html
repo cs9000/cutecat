@@ -7,18 +7,22 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <h2>Jay's Weather App</h2>
-    
-    <div class="form-container top-form">
-      <input type="text" id="zipInput" placeholder="Enter ZIP Code" />
-      <button onclick="getGridInfo()">Get Weather Forecast</button>
+    <div class="container">
+      <h2>Jay's Weather App</h2>
+      
+      <div id="recent-zips" class="recent-zips-container"></div>
+      
+      <div class="forecast-section">
+        <div id="forecast-display"></div>
+      </div>
+      
+      <div class="form-container">
+        <input type="text" id="zipInput" placeholder="Enter ZIP Code" />
+        <button onclick="getGridInfo()">Get Weather Forecast</button>
+      </div>
+      
+      <div id="output" class="bottom-data">Enter a ZIP code above to get the weather forecast.</div>
     </div>
-    
-    <div class="forecast-section">
-      <div id="forecast-display"></div>
-    </div>
-    
-    <div id="output" class="bottom-data">Enter a ZIP code above to get the weather forecast.</div>
 
     <!-- Include the external JavaScript file -->
     <script src="script.js"></script>
